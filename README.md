@@ -1,32 +1,50 @@
+# Chrome Burp Proxy Launcher
+
+<div align="center">
+
+![Version](https://img.shields.io/badge/version-1.2-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+</div>
+
 A Windows batch script that automatically configures and launches Chrome with Burp Suite proxy for web application security testing.
-🚀 Features
 
-One-Click Setup: Automatically configures Chrome with Burp Suite proxy
-Isolated Profiles: Creates a fresh Chrome profile for each session
-Auto-Cleanup: Removes old Chrome profiles to save disk space
-System Proxy Management: Easily toggle proxy settings on/off
-Custom Port Configuration: Change the proxy port as needed
-Auto-Detection: Automatically finds and launches Burp Suite
+## 🚀 Features
 
-📋 Prerequisites
+- **One-Click Setup**: Automatically configures Chrome with Burp Suite proxy
+- **Isolated Profiles**: Creates a fresh Chrome profile for each session
+- **Auto-Cleanup**: Removes old Chrome profiles to save disk space
+- **System Proxy Management**: Easily toggle proxy settings on/off
+- **Custom Port Configuration**: Change the proxy port as needed
+- **Auto-Detection**: Automatically finds and launches Burp Suite
 
-Windows operating system
-Google Chrome installed
-Burp Suite Community/Professional installed
+## 📋 Prerequisites
 
-🔧 Installation
+- Windows operating system
+- Google Chrome installed
+- Burp Suite Community/Professional installed
 
-Clone this repository or download the script:
+## 🔧 Installation
 
-bashgit clone https://github.com/parkjunmin/ProxySetting_Burpsuite.git
+1. Clone this repository or download the script:
+```bash
+git clone https://github.com/parkjunmin/ProxySetting_Burpsuite.git
+```
 
-No additional installation is required - just run the batch file!
+2. No additional installation is required - just run the batch file!
 
-📖 Usage
-Running the Script
-Simply double-click the .bat file or run it from the command prompt.
-Menu Options
+## 📖 Usage
+
+### Running the Script
+
+Simply double-click the `.bat` file or run it from the command prompt.
+
+### Menu Options
+
 The launcher provides three main options:
+
+```
 ==================================================
      Chrome Burp Proxy Launcher v1.2 by DBDROP
      (swm5048@naver.com)
@@ -43,47 +61,62 @@ The launcher provides three main options:
  2. 프록시 설정 해제
  3. 프록시 포트 변경
 --------------------------------------------------
-Option 1: Launch Chrome with Burp Proxy
+```
+
+#### Option 1: Launch Chrome with Burp Proxy
+
 Selecting this option will:
+- Check if Burp Suite is running and launch it if not
+- Configure system proxy to 127.0.0.1:8080 (or your custom port)
+- Clean up any previous Chrome profiles
+- Create a fresh isolated Chrome profile
+- Launch Chrome configured to use Burp Suite as a proxy
 
-Check if Burp Suite is running and launch it if not
-Configure system proxy to 127.0.0.1:8080 (or your custom port)
-Clean up any previous Chrome profiles
-Create a fresh isolated Chrome profile
-Launch Chrome configured to use Burp Suite as a proxy
+#### Option 2: Disable Proxy Settings
 
-Option 2: Disable Proxy Settings
 This option disables the system-wide proxy configuration.
-Option 3: Change Proxy Port
+
+#### Option 3: Change Proxy Port
+
 Change the port used for the proxy connection (if you need a different port than the default 8080).
-💡 How It Works
 
-The script searches for Burp Suite in common installation locations
-Creates a fresh Chrome profile in C:\Temp\ChromeBurpProfile-[random]
-Configures system proxy settings to route through Burp Suite
-Launches Chrome with special flags for proxy configuration
-On subsequent runs, cleans up old profile directories
+## 💡 How It Works
 
-⚠️ Troubleshooting
-No Traffic in Burp Suite
+1. The script searches for Burp Suite in common installation locations
+2. Creates a fresh Chrome profile in C:\Temp\ChromeBurpProfile-[random]
+3. Configures system proxy settings to route through Burp Suite
+4. Launches Chrome with special flags for proxy configuration
+5. On subsequent runs, cleans up old profile directories
+
+## ⚠️ Troubleshooting
+
+### No Traffic in Burp Suite
+
 Make sure:
+1. Burp Suite Proxy listener is configured for the correct port (default: 8080)
+2. "Intercept is on" is enabled in the Intercept tab
+3. Chrome is actually using the configured proxy (check Chrome settings)
 
-Burp Suite Proxy listener is configured for the correct port (default: 8080)
-"Intercept is on" is enabled in the Intercept tab
-Chrome is actually using the configured proxy (check Chrome settings)
+### Chrome Profile Creation Errors
 
-Chrome Profile Creation Errors
 If Chrome complains about data directory creation failures:
+- Make sure C:\Temp directory exists and is writable
+- Try running the script as Administrator
 
-Make sure C:\Temp directory exists and is writable
-Try running the script as Administrator
+## 📜 License
 
-📜 License
 This project is available under the MIT License - see the LICENSE file for details.
-👨‍💻 Author
-DBDROP - GitHub Profile
+
+## 👨‍💻 Author
+
+**DBDROP** - [GitHub Profile](https://github.com/parkjunmin)
+
 Contact: swm5048@naver.com
-🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check issues page.
-⭐ Show your support
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/parkjunmin/ProxySetting_Burpsuite/issues).
+
+## ⭐ Show your support
+
 If you find this tool useful, please give it a star on GitHub!
