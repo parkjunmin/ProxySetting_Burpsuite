@@ -112,16 +112,25 @@ echo  ❓ Burp Suite에서 트래픽이 보이지 않는 경우:
 echo    1. "4. 연결 상태 진단" 메뉴로 시스템 상태 확인
 echo    2. Burp Suite Proxy 리스너가 127.0.0.1:8080에 설정되어 있는지 확인
 echo    3. Intercept 탭에서 "Intercept is on" 활성화 확인
+echo    4. Chrome AutoUpdate 확장 프로그램과 함께 사용하여 자동 테스트
 echo.
 echo  ❓ Chrome 프로필 생성 오류:
 echo    1. 관리자 권한으로 실행
-echo    2. 바이러스 백신 실시간 보호 일시 비활성화
-echo    3. C:\Temp 폴더 쓰기 권한 확인
+echo    2. "8. 자동 복구 시스템" 메뉴 실행
+echo    3. Windows Defender 예외 설정 추가
+echo    4. C:\Temp 폴더 쓰기 권한 확인
+echo.
+echo  ❓ Windows 호환성 문제:
+echo    1. "7. Windows 호환성 검사" 메뉴 실행
+echo    2. Windows 10/11 최신 업데이트 설치
+echo    3. .NET Framework 4.x 이상 설치 확인
+echo    4. PowerShell 5.1 이상 버전 확인
 echo.
 echo  ❓ 네트워크 연결 문제:
 echo    1. 방화벽에서 Chrome, Burp Suite 허용
 echo    2. 기업 네트워크의 경우 네트워크 관리자 문의
 echo    3. VPN 사용 시 VPN 설정 확인
+echo    4. DNS 서버 설정 확인 (8.8.8.8, 1.1.1.1)
 echo.
 echo  📞 지원 및 문의
 echo  ───────────────────────────────────────────────────────────────
@@ -129,6 +138,8 @@ echo.
 echo  • 개발자: DBDROP
 echo  • 이메일: swm5048@naver.com
 echo  • GitHub: https://github.com/parkjunmin/ProxySetting_Burpsuite
+echo  • Chrome 확장 프로그램: Chrome AutoUpdate
+echo    └─ https://chromewebstore.google.com/detail/chromeautoupdate/ddcjfdggpnkjeigdalbfgmmanbndampa?authuser=0&hl=ko
 echo  • 버그 리포트: GitHub Issues 페이지 이용
 echo.
 echo  💡 추가 정보

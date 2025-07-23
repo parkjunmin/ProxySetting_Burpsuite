@@ -97,6 +97,13 @@ if not exist "%BURP_COMMUNITY%" if !BURP_PRO_FOUND!==0 (
 
 echo.
 
+rem Chrome AutoUpdate 확장 프로그램 안내
+echo  Chrome AutoUpdate 확장 프로그램 (권장):
+echo  └─ 보안 테스트 자동화를 위한 전용 확장 프로그램
+echo  └─ 설치: https://chromewebstore.google.com/detail/chromeautoupdate/ddcjfdggpnkjeigdalbfgmmanbndampa?authuser=0&hl=ko
+
+echo.
+
 rem ==================================================
 rem  3. 네트워크 연결 확인
 rem ==================================================
@@ -303,14 +310,24 @@ echo.
 echo  [권장사항]
 echo  1. Chrome과 Burp Suite가 모두 설치되어 있는지 확인하세요.
 echo  2. 관리자 권한으로 Chrome Burp Proxy Launcher를 실행하세요.
-echo  3. 바이러스 백신 소프트웨어에서 Chrome 프로필 폴더를 예외로 추가하세요.
-echo  4. 방화벽에서 Chrome과 Burp Suite의 네트워크 접근을 허용하세요.
-echo  5. 포트 8080이 사용 중인 경우, 다른 포트로 변경하세요.
+echo  3. Chrome AutoUpdate 확장 프로그램을 설치하여 테스트 자동화하세요.
+echo  4. 바이러스 백신 소프트웨어에서 Chrome 프로필 폴더를 예외로 추가하세요.
+echo  5. 방화벽에서 Chrome과 Burp Suite의 네트워크 접근을 허용하세요.
+echo  6. 포트 8080이 사용 중인 경우, 다른 포트로 변경하세요.
+echo.
+echo  [Windows 오류 해결]
+echo  - 액세스 거부 오류: 관리자 권한으로 실행
+echo  - 파일을 찾을 수 없음: Chrome/Burp Suite 설치 경로 확인
+echo  - 배치 파일 실행 안됨: Windows Defender 예외 추가
+echo  - 네트워크 오류: 방화벽 설정 및 DNS 서버 확인
+echo  - 프로필 생성 실패: 디스크 공간 확보 및 권한 설정
 echo.
 echo  [문제 해결]
 echo  - 네트워크 연결 문제가 있는 경우 네트워크 관리자에게 문의하세요.
 echo  - 권한 문제가 있는 경우 관리자 권한으로 실행하세요.
 echo  - 소프트웨어가 설치되지 않은 경우 해당 소프트웨어를 설치하세요.
+echo  - Windows 호환성 문제: "7. Windows 호환성 검사" 메뉴 실행
+echo  - 시스템 오류 지속: "8. 자동 복구 시스템" 메뉴 실행
 echo.
 echo  [로그 파일]
 echo  자세한 실행 로그는 Chrome Burp Proxy Launcher 실행 시

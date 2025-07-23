@@ -50,6 +50,31 @@
 - 임시 파일 및 폴더 정리
 - 시스템 리소스 최적화
 
+## 🔗 관련 도구
+
+### 🌐 **Chrome AutoUpdate 확장 프로그램**
+
+보안 테스트 효율성을 더욱 높이기 위해 개발된 전용 Chrome 확장 프로그램입니다.
+
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Install-blue?logo=google-chrome)](https://chromewebstore.google.com/detail/chromeautoupdate/ddcjfdggpnkjeigdalbfgmmanbndampa?authuser=0&hl=ko)
+
+**주요 기능:**
+- 🔄 **자동 새로고침**: 지정된 간격으로 페이지 자동 새로고침
+- ⏱️ **유연한 시간 설정**: 초 단위부터 시간 단위까지 세밀한 조절
+- 🎯 **특정 페이지 타겟팅**: URL 패턴 기반 자동 새로고침
+- 🛡️ **보안 테스트 최적화**: Burp Suite와 연동하여 반복 테스트 자동화
+
+**설치 방법:**
+1. [Chrome 웹 스토어 링크](https://chromewebstore.google.com/detail/chromeautoupdate/ddcjfdggpnkjeigdalbfgmmanbndampa?authuser=0&hl=ko) 접속
+2. "Chrome에 추가" 버튼 클릭
+3. Chrome Burp Proxy Launcher와 함께 사용하여 자동화된 보안 테스트 수행
+
+**사용 시나리오:**
+- **세션 타임아웃 테스트**: 주기적으로 페이지를 새로고침하여 세션 유지 확인
+- **동적 콘텐츠 분석**: 시간에 따른 웹 페이지 변화 모니터링
+- **로드 밸런싱 테스트**: 반복 요청으로 서버 부하 분산 확인
+- **캐시 무효화 테스트**: 캐시 정책 및 무효화 메커니즘 검증
+
 ## 📋 시스템 요구사항
 
 - **운영체제**: Windows 10/11 (64비트 권장)
@@ -57,6 +82,8 @@
 - **보안 도구**: Burp Suite Community/Professional
 - **권한**: 관리자 권한 (최적 성능을 위해 권장)
 - **네트워크**: 인터넷 연결 (외부 IP 확인용)
+- **디스크 공간**: 최소 500MB 여유 공간
+- **메모리**: 최소 4GB RAM (8GB 권장)
 
 ## 🔧 설치 및 설정
 
@@ -69,10 +96,11 @@ cd ProxySetting_Burpsuite
 ### 2. 필수 소프트웨어 설치
 - [Google Chrome](https://www.google.com/chrome/) 설치
 - [Burp Suite Community](https://portswigger.net/burp/communitydownload) 또는 Professional 설치
+- [Chrome AutoUpdate 확장 프로그램](https://chromewebstore.google.com/detail/chromeautoupdate/ddcjfdggpnkjeigdalbfgmmanbndampa?authuser=0&hl=ko) 설치 (선택사항)
 
 ### 3. 실행
-- `Burp_Start.bat` 파일을 **관리자 권한으로 실행** (권장)
-- 또는 일반 권한으로 실행 (일부 기능 제한될 수 있음)
+- `Quick_Launch.bat` 파일을 **관리자 권한으로 실행** (권장)
+- 또는 `Burp_Start.bat` 파일을 직접 실행
 
 ## 📖 사용 방법
 
@@ -180,39 +208,162 @@ cd ProxySetting_Burpsuite
 - `172.16.*.*` ~ `172.31.*.*` (사설망 B클래스)
 - `192.168.*.*` (사설망 C클래스)
 
-## ⚠️ 문제 해결
+## ⚠️ Windows 사용자 문제 해결
 
-### 자주 발생하는 문제들
+### 🚨 **자주 발생하는 Windows 오류**
 
-#### 🚫 **Burp Suite에서 트래픽이 보이지 않는 경우**
+#### ❌ **"액세스가 거부되었습니다" 오류**
 
-**해결 방법:**
-1. **"4. 연결 상태 진단"** 메뉴로 시스템 상태 확인
-2. Burp Suite Proxy 리스너가 올바른 포트에 바인딩되어 있는지 확인
-3. Chrome에서 `https://burp`에 접속하여 CA 인증서 설치
-4. Intercept 탭에서 "Intercept is on" 활성화 확인
-
-#### 🔒 **Chrome 프로필 생성 오류**
+**원인**: 관리자 권한 부족 또는 UAC(사용자 계정 컨트롤) 제한
 
 **해결 방법:**
-1. **관리자 권한으로 실행**
-2. `C:\Temp` 폴더 쓰기 권한 확인
-3. 바이러스 백신 소프트웨어의 실시간 보호 기능 일시 비활성화
-4. 디스크 용량 확인 (최소 100MB 여유 공간 필요)
+1. **배치 파일을 마우스 우클릭** → **"관리자 권한으로 실행"** 선택
+2. UAC 창이 나타나면 **"예"** 클릭
+3. 여전히 문제가 있다면:
+   ```cmd
+   # 명령 프롬프트를 관리자 권한으로 실행 후
+   cd "프로그램이 있는 폴더 경로"
+   Burp_Start.bat
+   ```
 
-#### 🌐 **네트워크 연결 문제**
+#### ❌ **"시스템에서 지정한 파일을 찾을 수 없습니다" 오류**
+
+**원인**: Chrome 또는 Burp Suite 설치 경로 문제
 
 **해결 방법:**
-1. 방화벽 설정에서 Chrome 및 Burp Suite 허용
-2. 기업 네트워크의 경우 네트워크 관리자에게 문의
-3. VPN 사용 시 VPN 설정 확인
+1. **Chrome 설치 확인**:
+   - `C:\Program Files\Google\Chrome\Application\chrome.exe` 경로 확인
+   - 없다면 [Chrome 다운로드](https://www.google.com/chrome/) 후 설치
+2. **Burp Suite 설치 확인**:
+   - 기본 설치 경로: `%USERPROFILE%\AppData\Local\Programs\BurpSuiteCommunity\`
+   - 없다면 [Burp Suite 다운로드](https://portswigger.net/burp/communitydownload) 후 설치
+3. **수동 경로 설정**:
+   - `config.ini` 파일을 메모장으로 열기
+   - `BURP_PATH=실제 Burp Suite 설치 경로` 수정
 
-#### 📁 **로그 파일 접근 불가**
+#### ❌ **"배치 파일이 실행되지 않습니다" 오류**
+
+**원인**: Windows Defender 또는 바이러스 백신 차단
 
 **해결 방법:**
-1. `C:\Temp\BurpLauncher_Logs` 폴더 권한 확인
-2. 관리자 권한으로 프로그램 재실행
-3. 바이러스 백신의 파일 보호 기능 확인
+1. **Windows Defender 예외 추가**:
+   - Windows 설정 → 업데이트 및 보안 → Windows 보안
+   - 바이러스 및 위협 방지 → 바이러스 및 위협 방지 설정 관리
+   - 제외 추가 또는 제거 → 제외 추가 → 폴더
+   - 프로그램이 있는 폴더 선택
+2. **실행 정책 확인**:
+   ```powershell
+   # PowerShell을 관리자 권한으로 실행
+   Get-ExecutionPolicy
+   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+#### ❌ **"네트워크 경로를 찾을 수 없습니다" 오류**
+
+**원인**: 방화벽 또는 네트워크 설정 문제
+
+**해결 방법:**
+1. **Windows 방화벽 설정**:
+   - 제어판 → 시스템 및 보안 → Windows Defender 방화벽
+   - "Windows Defender 방화벽을 통해 앱 또는 기능 허용"
+   - Chrome과 Burp Suite 체크박스 활성화
+2. **네트워크 어댑터 재설정**:
+   ```cmd
+   # 명령 프롬프트를 관리자 권한으로 실행
+   ipconfig /flushdns
+   netsh winsock reset
+   netsh int ip reset
+   # 컴퓨터 재시작
+   ```
+
+#### ❌ **"포트가 이미 사용 중입니다" 오류**
+
+**원인**: 다른 프로그램이 8080 포트 사용 중
+
+**해결 방법:**
+1. **사용 중인 프로그램 확인**:
+   ```cmd
+   netstat -ano | findstr :8080
+   tasklist /fi "pid eq [PID번호]"
+   ```
+2. **포트 변경**:
+   - 프로그램 실행 → "3. 프록시 포트 변경" 선택
+   - 8443, 9090, 8888 등 다른 포트로 변경
+3. **충돌 프로그램 종료**:
+   ```cmd
+   taskkill /f /pid [PID번호]
+   ```
+
+#### ❌ **"Chrome 프로필을 생성할 수 없습니다" 오류**
+
+**원인**: 디스크 공간 부족 또는 임시 폴더 권한 문제
+
+**해결 방법:**
+1. **디스크 공간 확인**:
+   - C: 드라이브에 최소 500MB 여유 공간 확보
+   - 디스크 정리 실행: `cleanmgr /c`
+2. **임시 폴더 권한 설정**:
+   - `C:\Temp` 폴더 우클릭 → 속성 → 보안
+   - 현재 사용자에게 "모든 권한" 부여
+3. **바이러스 백신 예외 설정**:
+   - `C:\Temp\ChromeBurpProfile-*` 폴더를 바이러스 백신 예외 목록에 추가
+
+#### ❌ **"스크립트 실행이 비활성화되어 있습니다" 오류**
+
+**원인**: PowerShell 실행 정책 제한
+
+**해결 방법:**
+1. **PowerShell 관리자 권한으로 실행**
+2. **실행 정책 변경**:
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+3. **그룹 정책 확인** (기업 환경):
+   - `gpedit.msc` 실행
+   - 컴퓨터 구성 → 관리 템플릿 → Windows 구성 요소 → Windows PowerShell
+   - "스크립트 실행 켜기" 정책 확인
+
+### 🔧 **추가 Windows 최적화 팁**
+
+#### 🚀 **성능 최적화**
+1. **가상 메모리 설정**:
+   - 시스템 속성 → 고급 → 성능 설정 → 고급 → 가상 메모리
+   - 초기 크기: 4096MB, 최대 크기: 8192MB
+2. **불필요한 시작 프로그램 비활성화**:
+   - 작업 관리자 → 시작프로그램 탭
+   - 불필요한 프로그램 비활성화
+3. **Windows 업데이트 확인**:
+   - 최신 Windows 업데이트 설치로 호환성 향상
+
+#### 🛡️ **보안 설정**
+1. **SmartScreen 설정**:
+   - Windows 보안 → 앱 및 브라우저 컨트롤
+   - "인식되지 않은 앱 확인" 설정 조정
+2. **실시간 보호 예외**:
+   - 프로그램 폴더를 실시간 보호 예외 목록에 추가
+3. **네트워크 프로필 설정**:
+   - 개인 네트워크로 설정하여 방화벽 제한 완화
+
+### 📞 **Windows 문제 해결 지원**
+
+**단계별 문제 해결:**
+1. **"2. 시스템 환경 검사"** 메뉴 실행으로 자동 진단
+2. 로그 파일 확인: `C:\Temp\BurpLauncher_Logs\`
+3. Windows 이벤트 뷰어에서 오류 로그 확인
+4. 필요시 개발자에게 로그 파일과 함께 문의
+
+**긴급 복구 방법:**
+```cmd
+# 시스템 파일 검사
+sfc /scannow
+
+# DISM 복구
+DISM /Online /Cleanup-Image /RestoreHealth
+
+# 네트워크 설정 초기화
+netsh int ip reset
+netsh winsock reset
+```
 
 ## 📊 로그 시스템
 
@@ -228,11 +379,13 @@ C:\Temp\BurpLauncher_Logs\launcher_YYYYMMDD.log
 - 프록시 설정 변경 내역
 - 오류 및 경고 메시지
 - 사용자 작업 내역
+- Windows 시스템 오류 정보
 
 ### 로그 활용
 - 문제 발생 시 원인 분석
 - 시스템 성능 모니터링
 - 보안 테스트 세션 추적
+- Windows 오류 디버깅
 
 ## 🔧 설정 파일 (config.ini)
 
@@ -243,6 +396,8 @@ PROXY_PORT=8080
 BURP_PATH=C:\Users\...\BurpSuiteCommunity.exe
 LAST_UPDATE=2024-01-15 14:30:25
 AUTHOR=DBDROP (swm5048@naver.com)
+WINDOWS_VERSION=Windows 10
+CHROME_VERSION=120.0.6099.109
 ```
 
 ## 🛡️ 보안 고려사항
@@ -260,6 +415,11 @@ AUTHOR=DBDROP (swm5048@naver.com)
 - 테스트 트래픽이 외부로 유출되지 않도록 주의
 - 기업 네트워크에서 사용 시 보안 정책 준수
 
+### Windows 보안 설정
+- Windows Defender 예외 설정 시 신중한 판단
+- 관리자 권한 사용 시 보안 위험 인식
+- 정기적인 시스템 보안 업데이트
+
 ## 📜 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 LICENSE 파일을 참조하세요.
@@ -270,6 +430,7 @@ AUTHOR=DBDROP (swm5048@naver.com)
 - 📧 **이메일**: swm5048@naver.com
 - 🐙 **GitHub**: [parkjunmin](https://github.com/parkjunmin)
 - 🔗 **프로젝트**: [Chrome Burp Proxy Launcher](https://github.com/parkjunmin/ProxySetting_Burpsuite)
+- 🌐 **Chrome 확장 프로그램**: [Chrome AutoUpdate](https://chromewebstore.google.com/detail/chromeautoupdate/ddcjfdggpnkjeigdalbfgmmanbndampa?authuser=0&hl=ko)
 
 ## 🤝 기여하기
 
@@ -286,11 +447,12 @@ AUTHOR=DBDROP (swm5048@naver.com)
 [Issues 페이지](https://github.com/parkjunmin/ProxySetting_Burpsuite/issues)에서 버그를 신고해주세요.
 
 **버그 리포트 시 포함할 정보:**
-- Windows 버전
+- Windows 버전 및 아키텍처
 - Chrome 버전
 - Burp Suite 버전 (Community/Professional)
 - 오류 메시지 또는 로그 파일 내용
 - 재현 단계
+- 시스템 사양 (RAM, 디스크 공간 등)
 
 ## 🌟 후원하기
 
@@ -306,6 +468,8 @@ AUTHOR=DBDROP (swm5048@naver.com)
 - 🛡️ 관리자 권한 및 시스템 요구사항 검증
 - 🔧 지능형 Burp Suite 경로 탐지
 - 🧹 향상된 자동 정리 시스템
+- 🚨 Windows 오류 대응 강화
+- 🔗 Chrome AutoUpdate 확장 프로그램 연동
 
 ### v1.2 (2023-12-01)
 - 🔄 기본 프록시 설정 기능

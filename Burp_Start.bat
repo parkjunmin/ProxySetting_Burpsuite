@@ -74,26 +74,70 @@ if %errorlevel% neq 0 (
 exit /b
 
 rem ==================================================
-rem  새로운 기능: 시스템 요구사항 검증
+rem  새로운 기능: 시스템 요구사항 검증 (Windows 오류 대응 강화)
 rem ==================================================
 :ValidateSystemRequirements
 call :WriteLog "[검증] 시스템 요구사항 확인 시작"
 
-rem Chrome 설치 확인
-if not exist "%CHROME_PATH%" (
-    call :WriteLog "[오류] Chrome이 설치되지 않았습니다: %CHROME_PATH%"
+rem Windows 버전 확인
+for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
+call :WriteLog "[시스템] Windows 버전: %VERSION%"
+
+rem Chrome 설치 확인 (다중 경로 지원)
+set "CHROME_FOUND=0"
+set "CHROME_PATHS=%CHROME_PATH%;"
+set "CHROME_PATHS=%CHROME_PATHS%C:\Program Files (x86)\Google\Chrome\Application\chrome.exe;"
+set "CHROME_PATHS=%CHROME_PATHS%%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe;"
+set "CHROME_PATHS=%CHROME_PATHS%%USERPROFILE%\AppData\Local\Google\Chrome\Application\chrome.exe"
+
+for %%p in (%CHROME_PATHS%) do (
+    if exist "%%p" (
+        set "CHROME_PATH=%%p"
+        set "CHROME_FOUND=1"
+        call :WriteLog "[확인] Chrome 발견: %%p"
+        goto :ChromeFound
+    )
+)
+
+:ChromeFound
+if %CHROME_FOUND%==0 (
+    call :WriteLog "[오류] Chrome이 설치되지 않았습니다"
     echo  [오류] Google Chrome이 설치되지 않았습니다.
     echo  [해결] https://www.google.com/chrome/ 에서 Chrome을 다운로드하여 설치하세요.
+    echo  [참고] 다음 경로에서 Chrome을 찾았는지 확인하세요:
+    echo         - C:\Program Files\Google\Chrome\Application\
+    echo         - C:\Program Files (x86)\Google\Chrome\Application\
+    echo         - %LOCALAPPDATA%\Google\Chrome\Application\
     pause
     exit /b 1
 )
-call :WriteLog "[확인] Chrome 설치 확인됨: %CHROME_PATH%"
 
-rem 임시 디렉토리 쓰기 권한 확인
+rem Chrome 버전 확인
+for /f "tokens=*" %%v in ('"%CHROME_PATH%" --version 2^>nul') do (
+    call :WriteLog "[확인] Chrome 버전: %%v"
+)
+
+rem 임시 디렉토리 생성 및 권한 확인
+if not exist "C:\Temp" (
+    mkdir "C:\Temp" 2>nul
+    if %errorlevel% neq 0 (
+        call :WriteLog "[오류] C:\Temp 디렉토리 생성 실패"
+        echo  [오류] 임시 디렉토리를 생성할 수 없습니다.
+        echo  [해결] 관리자 권한으로 실행하거나 다음 명령을 실행하세요:
+        echo         mkdir C:\Temp
+        pause
+        exit /b 1
+    )
+)
+
 echo test > "C:\Temp\write_test.tmp" 2>nul
 if %errorlevel% neq 0 (
     call :WriteLog "[오류] C:\Temp 디렉토리에 쓰기 권한이 없습니다"
     echo  [오류] 임시 디렉토리에 쓰기 권한이 없습니다.
+    echo  [해결] 다음 중 하나를 시도하세요:
+    echo         1. 관리자 권한으로 프로그램 실행
+    echo         2. C:\Temp 폴더 속성에서 보안 설정 확인
+    echo         3. 바이러스 백신 실시간 보호 일시 비활성화
     pause
     exit /b 1
 ) else (
@@ -101,13 +145,52 @@ if %errorlevel% neq 0 (
     call :WriteLog "[확인] 임시 디렉토리 쓰기 권한 확인됨"
 )
 
-rem 네트워크 연결 확인
-ping -n 1 8.8.8.8 >nul 2>&1
+rem 디스크 여유 공간 확인
+for /f "tokens=3" %%a in ('dir C:\ ^| findstr "bytes free"') do (
+    call :WriteLog "[시스템] C: 드라이브 여유 공간: %%a bytes"
+    if %%a LSS 524288000 (
+        echo  [경고] C: 드라이브 여유 공간이 부족합니다 (500MB 미만)
+        echo  [권장] 디스크 정리를 실행하여 공간을 확보하세요
+    )
+)
+
+rem Windows Defender 상태 확인
+powershell -Command "Get-MpPreference | Select-Object DisableRealtimeMonitoring" 2>nul | findstr "False" >nul
 if %errorlevel% equ 0 (
-    call :WriteLog "[확인] 인터넷 연결 상태 양호"
-) else (
+    call :WriteLog "[확인] Windows Defender 실시간 보호 활성화됨"
+    echo  [정보] Windows Defender가 활성화되어 있습니다.
+    echo  [참고] Chrome 프로필 생성 시 차단될 수 있으니 예외 설정을 고려하세요.
+)
+
+rem 네트워크 연결 확인 (다중 DNS 서버)
+set "NETWORK_OK=0"
+for %%dns in (8.8.8.8 1.1.1.1 208.67.222.222) do (
+    ping -n 1 %%dns >nul 2>&1
+    if !errorlevel! equ 0 (
+        set "NETWORK_OK=1"
+        call :WriteLog "[확인] 인터넷 연결 상태 양호 (DNS: %%dns)"
+        goto :NetworkCheckDone
+    )
+)
+
+:NetworkCheckDone
+if %NETWORK_OK%==0 (
     call :WriteLog "[경고] 인터넷 연결 확인 실패"
-    echo  [경고] 인터넷 연결을 확인할 수 없습니다. 외부 IP 조회가 제한될 수 있습니다.
+    echo  [경고] 인터넷 연결을 확인할 수 없습니다.
+    echo  [참고] 외부 IP 조회 및 일부 기능이 제한될 수 있습니다.
+    echo  [해결] 네트워크 연결 및 방화벽 설정을 확인하세요.
+)
+
+rem UAC 상태 확인
+reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA >nul 2>&1
+if %errorlevel% equ 0 (
+    for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA ^| findstr "EnableLUA"') do (
+        if "%%a"=="0x1" (
+            call :WriteLog "[확인] UAC 활성화됨"
+        ) else (
+            call :WriteLog "[경고] UAC 비활성화됨"
+        )
+    )
 )
 
 call :WriteLog "[검증] 시스템 요구사항 확인 완료"
@@ -269,9 +352,13 @@ echo  3. 프록시 포트 변경
 echo  4. 연결 상태 진단
 echo  5. 로그 파일 보기
 echo  6. 설정 초기화
+echo  7. Windows 호환성 검사
+echo  8. 자동 복구 시스템
 echo --------------------------------------------------
 echo.
-choice /c 123456 /n /m " 선택하세요 (1-6): "
+choice /c 12345678 /n /m " 선택하세요 (1-8): "
+if errorlevel 8 goto auto_repair
+if errorlevel 7 goto compatibility_check
 if errorlevel 6 goto reset_config
 if errorlevel 5 goto show_logs
 if errorlevel 4 goto diagnose
@@ -764,6 +851,44 @@ call :FindBurp
 goto MENU
 
 rem ==================================================
+rem  새로운 메뉴: Windows 호환성 검사
+rem ==================================================
+:compatibility_check
+echo.
+echo.
+echo ==================================================
+echo            Windows 호환성 검사
+echo ==================================================
+echo.
+call :CheckWindowsCompatibility
+echo.
+pause
+goto MENU
+
+rem ==================================================
+rem  새로운 메뉴: 자동 복구 시스템
+rem ==================================================
+:auto_repair
+echo.
+echo.
+echo ==================================================
+echo              자동 복구 시스템
+echo ==================================================
+echo.
+echo  [주의] 이 기능은 다음 작업을 수행합니다:
+echo         - 임시 파일 및 Chrome 프로필 정리
+echo         - Chrome 프로세스 강제 종료
+echo         - 네트워크 설정 새로고침
+echo         - 프록시 설정 초기화
+echo         - 권한 설정 복구
+echo.
+choice /c YN /n /m " 자동 복구를 실행하시겠습니까? (Y/N): "
+if errorlevel 2 goto MENU
+
+call :AutoRepair
+goto MENU
+
+rem ==================================================
 rem  개선된 Burp Suite 실행 확인
 rem ==================================================
 :CheckBurp
@@ -808,4 +933,140 @@ if %errorlevel%==0 (
     echo  [주의] 현재 Chrome이 실행 중입니다. 안전하게 종료 후 새 프로필로 실행됩니다.
     call :WriteLog "[Chrome] 기존 Chrome 실행 중 감지"
 )
+exit /b
+
+rem ==================================================
+rem  새로운 기능: Windows 오류 처리 및 복구
+rem ==================================================
+:HandleWindowsError
+set "ERROR_CODE=%~1"
+set "ERROR_MSG=%~2"
+call :WriteLog "[오류] Windows 오류 발생: %ERROR_CODE% - %ERROR_MSG%"
+
+if "%ERROR_CODE%"=="5" (
+    echo  [오류] 액세스가 거부되었습니다.
+    echo  [해결] 관리자 권한으로 프로그램을 다시 실행하세요.
+    echo         1. 배치 파일을 마우스 우클릭
+    echo         2. "관리자 권한으로 실행" 선택
+    echo         3. UAC 창에서 "예" 클릭
+) else if "%ERROR_CODE%"=="2" (
+    echo  [오류] 시스템에서 지정한 파일을 찾을 수 없습니다.
+    echo  [해결] 다음을 확인하세요:
+    echo         1. Chrome 설치 여부: %CHROME_PATH%
+    echo         2. Burp Suite 설치 여부: %BURP_PATH%
+    echo         3. 파일 경로가 올바른지 확인
+) else if "%ERROR_CODE%"=="32" (
+    echo  [오류] 다른 프로세스가 파일을 사용 중입니다.
+    echo  [해결] 다음을 시도하세요:
+    echo         1. Chrome 완전 종료 후 재시도
+    echo         2. 작업 관리자에서 chrome.exe 프로세스 강제 종료
+    echo         3. 컴퓨터 재시작 후 재시도
+) else (
+    echo  [오류] 알 수 없는 Windows 오류가 발생했습니다.
+    echo  [해결] 다음을 시도하세요:
+    echo         1. 컴퓨터 재시작
+    echo         2. Windows 업데이트 확인
+    echo         3. 바이러스 백신 일시 비활성화
+    echo         4. 시스템 파일 검사: sfc /scannow
+)
+
+echo.
+choice /c YN /n /m " 자동 복구를 시도하시겠습니까? (Y/N): "
+if errorlevel 2 exit /b
+
+call :AutoRepair
+exit /b
+
+rem ==================================================
+rem  새로운 기능: 자동 복구 시스템
+rem ==================================================
+:AutoRepair
+call :WriteLog "[복구] 자동 복구 시작"
+echo  [복구] 시스템 자동 복구를 시작합니다...
+echo.
+
+rem 1단계: 임시 파일 정리
+echo  [1/5] 임시 파일 정리 중...
+if exist "C:\Temp\ChromeBurpProfile-*" (
+    for /d %%i in (C:\Temp\ChromeBurpProfile-*) do (
+        rd /s /q "%%i" 2>nul
+        call :WriteLog "[복구] 정리됨: %%i"
+    )
+)
+del /q "C:\Temp\*.tmp" 2>nul
+echo  완료.
+
+rem 2단계: Chrome 프로세스 정리
+echo  [2/5] Chrome 프로세스 정리 중...
+taskkill /f /im chrome.exe >nul 2>&1
+timeout /t 2 >nul
+echo  완료.
+
+rem 3단계: 네트워크 설정 새로고침
+echo  [3/5] 네트워크 설정 새로고침 중...
+ipconfig /flushdns >nul 2>&1
+echo  완료.
+
+rem 4단계: 레지스트리 프록시 설정 정리
+echo  [4/5] 프록시 설정 정리 중...
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 0 /f >nul 2>&1
+echo  완료.
+
+rem 5단계: 권한 확인 및 복구
+echo  [5/5] 권한 설정 확인 중...
+if not exist "C:\Temp" mkdir "C:\Temp" 2>nul
+echo test > "C:\Temp\repair_test.tmp" 2>nul
+if %errorlevel% equ 0 (
+    del "C:\Temp\repair_test.tmp" 2>nul
+    echo  완료.
+) else (
+    echo  [경고] 권한 문제가 지속됩니다. 관리자 권한으로 실행하세요.
+)
+
+echo.
+echo  [복구] 자동 복구가 완료되었습니다.
+call :WriteLog "[복구] 자동 복구 완료"
+pause
+exit /b
+
+rem ==================================================
+rem  새로운 기능: Windows 호환성 검사
+rem ==================================================
+:CheckWindowsCompatibility
+call :WriteLog "[호환성] Windows 호환성 검사 시작"
+
+rem Windows 10/11 확인
+for /f "tokens=4-5 delims=. " %%i in ('ver') do (
+    set "WIN_MAJOR=%%i"
+    set "WIN_MINOR=%%j"
+)
+
+if %WIN_MAJOR% LSS 10 (
+    echo  [경고] Windows 10 미만 버전이 감지되었습니다.
+    echo  [권장] Windows 10 이상에서 최적의 성능을 발휘합니다.
+    call :WriteLog "[호환성] 지원되지 않는 Windows 버전: %WIN_MAJOR%.%WIN_MINOR%"
+) else (
+    call :WriteLog "[호환성] 지원되는 Windows 버전: %WIN_MAJOR%.%WIN_MINOR%"
+)
+
+rem .NET Framework 확인
+reg query "HKLM\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" /v Release >nul 2>&1
+if %errorlevel% equ 0 (
+    call :WriteLog "[호환성] .NET Framework 4.x 설치됨"
+) else (
+    echo  [경고] .NET Framework 4.x가 설치되지 않았을 수 있습니다.
+    echo  [참고] 일부 기능이 제한될 수 있습니다.
+)
+
+rem PowerShell 버전 확인
+for /f %%v in ('powershell -Command "$PSVersionTable.PSVersion.Major" 2^>nul') do (
+    if %%v GEQ 3 (
+        call :WriteLog "[호환성] PowerShell %%v.x 지원됨"
+    ) else (
+        echo  [경고] PowerShell 버전이 낮습니다 (현재: %%v.x)
+        echo  [권장] PowerShell 5.1 이상 설치를 권장합니다.
+    )
+)
+
+call :WriteLog "[호환성] Windows 호환성 검사 완료"
 exit /b
